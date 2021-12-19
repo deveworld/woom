@@ -1,0 +1,104 @@
+import express from "express";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
+import http from "http";
+// import WebSocket from "ws";
+
+const app = express();
+
+app.set("view engine", "pug");
+app.set("views", __dirname + "/views")
+app.use("/public", express.static(__dirname + "/public"));
+app.get("/", (_, res) => res.render("home"))
+app.get("/*", (_, res) => res.redirect("/"))
+
+const handleListen = () => { console.log("Listening on http://localhost:3000")};
+
+const httpServer = http.createServer(app);
+const socketServer = new Server(httpServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+instrument(socketServer, {
+    auth: {
+        type: "basic",
+        username: "admin",
+        password: "$2a$15$NNnwwPy4SkHW2x9aQ7UwbO96iVEIt6fjEXswgIgn6.s/J3TvD3jYm",
+    },
+});
+
+function publicRoom() {
+    const {
+      sockets: {
+        adapter: {sids, rooms},
+      },
+    } = socketServer;
+    const publicRooms = [];
+    rooms.forEach((_, key) => {
+        if (sids.get(key) === undefined) {
+            publicRooms.push(key);
+        }
+    });
+    return publicRooms;
+}
+
+function countRoom(roomName) {
+    return socketServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
+socketServer.on("connection", (socket) => {
+    socket["name"] = "Anonymous";
+    socket.emit("room_change", publicRoom());
+    socket.on("enter_room", (roomName, done) => {
+        socket.join(roomName);
+        done(countRoom(roomName));
+        socket.to(roomName).emit("welcome", socket.name, countRoom(roomName));
+        socketServer.sockets.emit("room_change", publicRoom());
+    });
+    socket.on("new_name", (name) => {
+        socket["name"] = name;
+    });
+    socket.on("new_message", (message, roomName, done) => {
+        socket.to(roomName).emit("new_message", `${socket.name}: ${message}`);
+        done();
+    });
+    socket.on("disconnecting", () => {
+       socket.rooms.forEach((room) => {
+           socket.to(room).emit("bye", socket.name, countRoom(room) - 1);
+       });
+    });
+    socket.on("disconnect", () => {
+        socketServer.sockets.emit("room_change", publicRoom());
+    });
+});
+
+// const wss = new WebSocket.Server({ server });
+//
+// const sockets = [];
+//
+// wss.on("connection", (socket) => {
+//     sockets.push(socket);
+//     socket["name"] = "Anonymous";
+//     console.log("Connected to Client ✔");
+//     socket.on("close", () => {
+//         console.log("Disconnected from the Client ❌");
+//     });
+//     socket.on("message", (msg) => {
+//         const message = JSON.parse(msg.toString());
+//         switch (message.type) {
+//             case "new_message":
+//                 const sendMessage = `${socket.name}: ${message.payload}`;
+//                 sockets.forEach((s) => s.send(sendMessage));
+//                 break;
+//             case "name":
+//                 socket["name"] = message.payload;
+//                 break;
+//             default:
+//                 break;
+//         }
+//     });
+// })
+
+httpServer.listen(3000, handleListen);
