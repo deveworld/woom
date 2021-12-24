@@ -31,6 +31,13 @@ async function initCall() {
     makeConnection();
 }
 
+function woomEmit(event, data, done) {
+    socket.emit("woom", {
+        eventName: event,
+        data: data
+    }, done);
+}
+
 function addOption(value, label, parent, select) {
     const option = document.createElement("option");
     option.value = value;
@@ -172,8 +179,16 @@ async function handleWelcomeSubmit(event) {
     event.preventDefault();
     const input = welcomeForm.querySelector("input");
     await initCall();
-    socket.emit("enter_room", input.value);
-    roomName = input.value;
+    woomEmit("enter_room", {
+        roomName: input.value + "#woom",
+    }, () => {
+        roomName = undefined;
+        welcome.hidden = false;
+        call.hidden = true;
+        alert("Sorry, The room is full.");
+        location.reload();
+    });
+    roomName = input.value + "#woom";
     input.value = "";
 }
 
@@ -191,14 +206,20 @@ welcome.addEventListener("submit", handleWelcomeSubmit);
 socket.on("welcome", async () => {
     const offer = await myPeerConnection.createOffer();
     await myPeerConnection.setLocalDescription(offer);
-    socket.emit("offer", offer, roomName);
+    woomEmit("offer", {
+        offer: offer,
+        roomName: roomName
+    });
 });
 
 socket.on("offer", async (offer) => {
     await myPeerConnection.setRemoteDescription(offer);
     const answer = await myPeerConnection.createAnswer();
     await myPeerConnection.setLocalDescription(answer);
-    socket.emit("answer", answer, roomName);
+    woomEmit("answer", {
+        answer: answer,
+        roomName: roomName
+    });
 });
 
 socket.on("answer", async (answer) => {
@@ -231,7 +252,10 @@ function makeConnection() {
 }
 
 function handleIce(data) {
-    socket.emit("ice", data.candidate, roomName);
+    woomEmit("ice", {
+        ice: data.candidate,
+        roomName: roomName
+    });
 }
 
 function handleAddStream(data) {

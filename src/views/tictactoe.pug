@@ -1,0 +1,71 @@
+doctype html
+head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet", href="/public/css/tictactoe.css")
+    title TicTacToe
+html(lang="ko")
+    body
+        header
+            h1 It's TicTacToe!
+        main
+            h2
+                span Welcome to TicTacToe!! -
+                a(href="/play") Back
+            br
+            h2#message
+            br
+            div#welcome
+                form
+                    select#rules
+                        option(value="3") 3x3
+                        option(value="5") 5x5
+                    input(type="text", name="room", placeholder="Room name" required)
+                    button Enter Room
+            br
+            div#tictactoe-3
+                button#3-1(class="tictactoe3")  ㅤ
+                button#3-2(class="tictactoe3")  ㅤ
+                button#3-3(class="tictactoe3")  ㅤ
+                br
+                button#3-4(class="tictactoe3")  ㅤ
+                button#3-5(class="tictactoe3")  ㅤ
+                button#3-6(class="tictactoe3")  ㅤ
+                br
+                button#3-7(class="tictactoe3")  ㅤ
+                button#3-8(class="tictactoe3")  ㅤ
+                button#3-9(class="tictactoe3")  ㅤ
+            div#tictactoe-5
+                button#5-1(class="tictactoe5")  ㅤ
+                button#5-2(class="tictactoe5")  ㅤ
+                button#5-3(class="tictactoe5")  ㅤ
+                button#5-4(class="tictactoe5")  ㅤ
+                button#5-5(class="tictactoe5")  ㅤ
+                br
+                button#5-6(class="tictactoe5")  ㅤ
+                button#5-7(class="tictactoe5")  ㅤ
+                button#5-8(class="tictactoe5")  ㅤ
+                button#5-9(class="tictactoe5")  ㅤ
+                button#5-10(class="tictactoe5")  ㅤ
+                br
+                button#5-11(class="tictactoe5")  ㅤ
+                button#5-12(class="tictactoe5")  ㅤ
+                button#5-13(class="tictactoe5")  ㅤ
+                button#5-14(class="tictactoe5")  ㅤ
+                button#5-15(class="tictactoe5")  ㅤ
+                br
+                button#5-16(class="tictactoe5")  ㅤ
+                button#5-17(class="tictactoe5")  ㅤ
+                button#5-18(class="tictactoe5")  ㅤ
+                button#5-19(class="tictactoe5")  ㅤ
+                button#5-20(class="tictactoe5")  ㅤ
+                br
+                button#5-21(class="tictactoe5")  ㅤ
+                button#5-22(class="tictactoe5")  ㅤ
+                button#5-23(class="tictactoe5")  ㅤ
+                button#5-24(class="tictactoe5")  ㅤ
+                button#5-25(class="tictactoe5")  ㅤ
+        script(src="/socket.io/socket.io.js")
+        script(src="/public/js/tictactoe.js")

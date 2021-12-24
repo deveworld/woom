@@ -1,0 +1,32 @@
+doctype html
+html(lang="ko")
+    head
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+        title Woom
+    body
+        header
+            h1 It's Woom!
+        main
+            h2
+                span Welcome to Woom!! -
+                a(href="/") Back
+            br
+            div#welcome
+                form
+                    input(type="text", name="room", placeholder="Room name" required)
+                    button Enter Room
+            div#call
+                div#myStream
+                    video#myFace(autoplay, playsinline, width="400", height="400")
+                    button#video Video On ⭕
+                    button#audio Audio On ⭕
+                    button#haul Remove Hauling ❌
+                    select#cameras
+                    select#mics
+                video#peersStream(autoplay, playsinline, width="400", height="400")
+                button#mute Mute ❌
+        script(src="/socket.io/socket.io.js")
+        script(src="/public/js/woom.js")
